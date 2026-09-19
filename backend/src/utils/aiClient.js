@@ -25,27 +25,35 @@ const askAI = async (question) => {
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.AI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful assistant for UCL Campus Hub, a student portal. Answer briefly and helpfully.",
-          },
-          { role: "user", content: question },
-        ],
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.AI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are a helpful assistant for UCL Campus Hub, a student portal. Answer briefly and helpfully.\n\nStudent question: ${question}`,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || getFallbackAnswer(question);
+    if (!response.ok) {
+      console.error("AI API error:", response.status, data.error?.message || data);
+      return getFallbackAnswer(question);
+    }
+
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return text || getFallbackAnswer(question);
   } catch (error) {
+    console.error("AI API request failed:", error.message);
     return getFallbackAnswer(question);
   }
 };

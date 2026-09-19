@@ -1,7 +1,7 @@
 :root {
-  --red: #D6201A;
-  --red-dark: #A8140F;
-  --dark: #181212;
+  --red: #C81F1A;
+  --red-dark: #931712;
+  --dark: #1D1312;
   --bg: #F7F6F2;
   --card-border: #E5E3DC;
   --text: #17181C;
@@ -61,7 +61,7 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
 .sidebar {
   width: 232px;
   flex-shrink: 0;
-  background: var(--dark);
+  background: linear-gradient(135deg, #C81F1A 0%, #9B1C16 22%, #771917 45%, #521615 68%, #1D1312 100%);
   color: #F5F1EF;
   display: flex;
   flex-direction: column;
@@ -74,11 +74,11 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
   display: block;
   padding: 10px 12px;
   border-radius: 8px;
-  color: #C7C0BE;
+  color: #F1DEDC;
   font-size: 13.5px;
   font-weight: 600;
 }
-.sidebar nav a.active, .sidebar nav a:hover { background: #3A1614; color: #fff; }
+.sidebar nav a.active, .sidebar nav a:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
 .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
@@ -103,7 +103,7 @@ textarea.input { height: auto; padding: 10px 14px; resize: vertical; }
 .badge { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
 .badge-green { background: #E8F5EE; color: #0E8F5E; }
 .badge-amber { background: #FCEBC9; color: #B45309; }
-.badge-red { background: #FDEAE9; color: #D6201A; }
+.badge-red { background: #FCE7E5; color: #C81F1A; }
 
 .error-text { color: #B45309; font-size: 13px; }
 .muted { color: var(--muted); font-size: 13px; }

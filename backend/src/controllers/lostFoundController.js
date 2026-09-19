@@ -15,7 +15,8 @@ exports.reportItem = async (req, res) => {
     if (!name || !location) {
       return res.status(400).json({ message: "Name and location are required" });
     }
-    const item = await LostFoundItem.create({ name, status, location, description, reportedBy: req.user._id });
+    const photoUrl = req.file ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}` : undefined;
+    const item = await LostFoundItem.create({ name, status, location, description, photoUrl, reportedBy: req.user._id });
     res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });

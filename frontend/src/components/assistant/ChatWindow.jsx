@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatBubble from "./ChatBubble";
 import { askAssistant } from "../../services/assistantService";
 
@@ -9,12 +9,30 @@ const SUGGESTIONS = [
   "Who do I contact for financial aid?",
 ];
 
+const CHAT_HISTORY_KEY = "chub_chat_history";
+
+const DEFAULT_MESSAGES = [
+  { role: "assistant", text: "Hi! I'm your Campus Assistant. Ask me anything about announcements, events, bookings or lost items." },
+];
+
+function loadMessages() {
+  try {
+    const stored = sessionStorage.getItem(CHAT_HISTORY_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {
+    // ignore malformed storage
+  }
+  return DEFAULT_MESSAGES;
+}
+
 export default function ChatWindow() {
-  const [messages, setMessages] = useState([
-    { role: "assistant", text: "Hi! I'm your Campus Assistant. Ask me anything about announcements, events, bookings or lost items." },
-  ]);
+  const [messages, setMessages] = useState(loadMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   const send = async (text) => {
     const question = text ?? input;

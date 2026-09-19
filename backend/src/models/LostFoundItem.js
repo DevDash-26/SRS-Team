@@ -6,6 +6,7 @@ const lostFoundItemSchema = new mongoose.Schema(
     status: { type: String, enum: ["lost", "found"], default: "lost" },
     location: { type: String, required: true },
     description: { type: String },
+    photoUrl: { type: String },
     date: { type: Date, default: Date.now },
     reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },

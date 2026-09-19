@@ -2,6 +2,13 @@ export default function ItemCard({ item }) {
   const isLost = item.status === "lost";
   return (
     <div className="card">
+      {item.photoUrl && (
+        <img
+          src={item.photoUrl}
+          alt={item.name}
+          style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, marginBottom: 10 }}
+        />
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
         <div style={{ fontWeight: 700, fontSize: 13.5 }}>{item.name}</div>
         <span className={isLost ? "badge badge-amber" : "badge badge-green"}>{isLost ? "LOST" : "FOUND"}</span>

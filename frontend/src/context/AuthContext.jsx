@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("chub_token");
     localStorage.removeItem("chub_user");
+    sessionStorage.removeItem("chub_chat_history");
     setUser(null);
   };
 
