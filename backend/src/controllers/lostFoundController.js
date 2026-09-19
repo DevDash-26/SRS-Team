@@ -1,15 +1,31 @@
 const LostFoundItem = require("../models/LostFoundItem");
 
-exports.getItems = async (req, res) => {
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Supports searching by keyword across name/location/description and filtering
+// by lost vs found, so students can look for a specific item instead of scrolling.
+exports.getItems = async (req, res, next) => {
   try {
-    const items = await LostFoundItem.find().sort({ createdAt: -1 });
+    const { q, status } = req.query;
+    const filter = {};
+
+    if (status === "lost" || status === "found") {
+      filter.status = status;
+    }
+
+    if (q && q.trim()) {
+      const term = new RegExp(escapeRegex(q.trim()), "i");
+      filter.$or = [{ name: term }, { location: term }, { description: term }];
+    }
+
+    const items = await LostFoundItem.find(filter).sort({ createdAt: -1 }).limit(200);
     res.json(items);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.reportItem = async (req, res) => {
+exports.reportItem = async (req, res, next) => {
   try {
     const { name, status, location, description } = req.body;
     if (!name || !location) {
@@ -19,6 +35,6 @@ exports.reportItem = async (req, res) => {
     const item = await LostFoundItem.create({ name, status, location, description, photoUrl, reportedBy: req.user._id });
     res.status(201).json(item);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

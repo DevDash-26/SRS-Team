@@ -55,6 +55,16 @@ export default function TextbookExchange() {
                 <div style={{ fontWeight: 700, fontSize: 13.5 }}>{t.title}</div>
                 <div className="muted" style={{ marginTop: 4 }}>{t.subject}</div>
                 {t.price && <div style={{ marginTop: 6, fontWeight: 600, fontSize: 12.5 }}>{t.price}</div>}
+                {t.listedBy && (
+                  <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #F0EFEA" }}>
+                    <div className="muted" style={{ fontSize: 11.5 }}>Listed by {t.listedBy.name}</div>
+                    {t.listedBy.email && (
+                      <a href={`mailto:${t.listedBy.email}?subject=${encodeURIComponent(`UCL Campus Hub — ${t.title}`)}`} style={{ fontSize: 11.5 }}>
+                        {t.listedBy.email}
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

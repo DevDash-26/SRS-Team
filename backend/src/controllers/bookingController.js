@@ -1,8 +1,8 @@
 const Booking = require("../models/Booking");
 
-exports.getMyBookings = async (req, res) => {
+exports.getMyBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id }).populate("room").sort({ createdAt: -1 });
+    const bookings = await Booking.find({ user: req.user._id }).populate("room").sort({ createdAt: -1 }).limit(200);
     const result = bookings.map((b) => ({
       _id: b._id,
       roomName: b.room ? b.room.name : "Room",
@@ -13,11 +13,11 @@ exports.getMyBookings = async (req, res) => {
     }));
     res.json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.createBooking = async (req, res) => {
+exports.createBooking = async (req, res, next) => {
   try {
     const { roomId, date, timeSlot, purpose } = req.body;
     if (!roomId || !date || !timeSlot) {
@@ -26,14 +26,18 @@ exports.createBooking = async (req, res) => {
     const booking = await Booking.create({ room: roomId, user: req.user._id, date, timeSlot, purpose });
     res.status(201).json(booking);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // Administrative staff / system admin: see every booking to approve or reject it
-exports.getAllBookings = async (req, res) => {
+exports.getAllBookings = async (req, res, next) => {
   try {
-    const bookings = await Booking.find().populate("room").populate("user", "name email role").sort({ createdAt: -1 });
+    const bookings = await Booking.find()
+      .populate("room")
+      .populate("user", "name email role")
+      .sort({ createdAt: -1 })
+      .limit(200);
     const result = bookings.map((b) => ({
       _id: b._id,
       roomName: b.room ? b.room.name : "Room",
@@ -45,11 +49,11 @@ exports.getAllBookings = async (req, res) => {
     }));
     res.json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.updateBookingStatus = async (req, res) => {
+exports.updateBookingStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
     if (!["approved", "rejected"].includes(status)) {
@@ -61,6 +65,6 @@ exports.updateBookingStatus = async (req, res) => {
     }
     res.json(booking);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

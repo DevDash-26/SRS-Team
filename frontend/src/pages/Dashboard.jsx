@@ -10,6 +10,9 @@ const cards = [
   { to: "/lost-found", label: "Lost & Found", desc: "Report or search for lost campus items." },
   { to: "/room-booking", label: "Room Booking", desc: "Check availability and request a study room." },
   { to: "/assistant", label: "Ask Assistant", desc: "Ask a question instead of searching manually." },
+  { to: "/info", label: "Info & Resources", desc: "FAQ, jobs, wellbeing, library, dining and more." },
+  { to: "/academic-support", label: "Academic Support", desc: "Request a study group, tutoring or mentorship." },
+  { to: "/facility-issues", label: "Facility Issues", desc: "Report a maintenance or facility problem." },
 ];
 
 export default function Dashboard() {

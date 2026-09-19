@@ -1,16 +1,16 @@
 const Room = require("../models/Room");
 
-exports.getRooms = async (req, res) => {
+exports.getRooms = async (req, res, next) => {
   try {
-    const rooms = await Room.find().sort({ name: 1 });
+    const rooms = await Room.find().sort({ name: 1 }).limit(200);
     res.json(rooms);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // Administrative staff / system admin: manage the room inventory
-exports.createRoom = async (req, res) => {
+exports.createRoom = async (req, res, next) => {
   try {
     const { name, capacity, location, available } = req.body;
     if (!name || !capacity) {
@@ -19,11 +19,11 @@ exports.createRoom = async (req, res) => {
     const room = await Room.create({ name, capacity, location, available });
     res.status(201).json(room);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.updateRoom = async (req, res) => {
+exports.updateRoom = async (req, res, next) => {
   try {
     const { name, capacity, location, available } = req.body;
     const room = await Room.findByIdAndUpdate(
@@ -36,11 +36,11 @@ exports.updateRoom = async (req, res) => {
     }
     res.json(room);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.deleteRoom = async (req, res) => {
+exports.deleteRoom = async (req, res, next) => {
   try {
     const room = await Room.findByIdAndDelete(req.params.id);
     if (!room) {
@@ -48,6 +48,6 @@ exports.deleteRoom = async (req, res) => {
     }
     res.json({ message: "Room deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

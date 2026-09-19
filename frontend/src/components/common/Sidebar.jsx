@@ -15,6 +15,7 @@ const links = [
   { to: "/assistant", label: "Ask Assistant" },
   { to: "/facility-issues", label: "Facility Issues" },
   { to: "/textbook-exchange", label: "Textbook Exchange" },
+  { to: "/info", label: "Info & Resources" },
   { to: "/feedback", label: "Feedback" },
 ];
 

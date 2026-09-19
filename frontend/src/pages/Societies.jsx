@@ -23,7 +23,7 @@ export default function Societies() {
       {error && <div className="error-text">{error}</div>}
       {!loading && !error && (!data || data.length === 0) && <div className="muted">No societies listed yet.</div>}
       <div className="grid grid-3">
-        {data?.map((s) => <SocietyCard key={s._id} society={s} />)}
+        {data?.map((s) => <SocietyCard key={s._id} society={s} canEdit={canPost} onUpdated={refetch} />)}
       </div>
     </Layout>
   );

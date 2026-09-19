@@ -7,7 +7,7 @@ const { isValidEmail } = require("../utils/validators");
 
 const RESET_CODE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -31,13 +31,13 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // Sends a 6-digit reset code to the user's email. Always responds the same way
 // whether or not the email is registered, so this can't be used to enumerate accounts.
-exports.forgotPassword = async (req, res) => {
+exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email || !isValidEmail(email)) {
@@ -55,11 +55,11 @@ exports.forgotPassword = async (req, res) => {
 
     res.json({ message: "If that email is registered, a reset code has been sent." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
   try {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) {
@@ -86,6 +86,6 @@ exports.resetPassword = async (req, res) => {
 
     res.json({ message: "Password reset successful. You can now sign in." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

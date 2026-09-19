@@ -1,36 +1,21 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Layout from "../components/common/Layout";
 import Loader from "../components/common/Loader";
 import InfoCard from "../components/infoPages/InfoCard";
-import CalendarEntryForm from "../components/infoPages/CalendarEntryForm";
+import InfoEntryForm from "../components/infoPages/InfoEntryForm";
 import { useFetch } from "../hooks/useFetch";
 import { useAuth } from "../hooks/useAuth";
 import { getInfoByCategory, createInfoContent, deleteInfoContent } from "../services/infoContentService";
-
-const TITLES = {
-  faq: "FAQ",
-  calendar: "Academic Calendar",
-  onboarding: "Student Onboarding",
-  volunteering: "Volunteering Opportunities",
-  alumni: "Alumni Engagement",
-  jobs: "Jobs & Internships",
-  "staff-directory": "Staff Directory",
-  "financial-support": "Financial Support",
-  sports: "Sports & Recreation",
-  dining: "Dining Information",
-  printing: "Printing Services",
-  wellbeing: "Wellbeing Support",
-  "it-support": "IT Support",
-  library: "Library Resources",
-  "student-life": "Student Life Highlights",
-};
+import { getInfoCategory } from "../utils/infoCategories";
 
 export default function InfoPage() {
   const { category } = useParams();
   const { user } = useAuth();
   const { data, loading, error, refetch } = useFetch(() => getInfoByCategory(category), [category]);
-  const title = TITLES[category] || category;
-  const canManage = category === "calendar" && user?.role && user.role !== "student";
+  const meta = getInfoCategory(category);
+  const title = meta?.label || category;
+  // Every role except students maintains the content they are responsible for
+  const canManage = Boolean(user?.role) && user.role !== "student";
 
   const handleCreate = async (payload) => {
     await createInfoContent(category, payload);
@@ -44,9 +29,14 @@ export default function InfoPage() {
 
   return (
     <Layout title={title}>
+      <div style={{ marginBottom: 16 }}>
+        <Link to="/info" className="muted" style={{ fontSize: 12.5 }}>&larr; All info &amp; resources</Link>
+        {meta?.description && <div className="muted" style={{ marginTop: 6 }}>{meta.description}</div>}
+      </div>
+
       {canManage && (
         <div style={{ marginBottom: 20, maxWidth: 420 }}>
-          <CalendarEntryForm onSubmit={handleCreate} />
+          <InfoEntryForm onSubmit={handleCreate} categoryLabel={title} />
         </div>
       )}
       {loading && <Loader label={`Loading ${title}...`} />}
@@ -54,7 +44,7 @@ export default function InfoPage() {
       {!loading && !error && (!data || data.length === 0) && <div className="muted">Nothing published here yet.</div>}
       <div className="grid grid-2">
         {data?.map((item) => (
-          <InfoCard key={item._id} item={item} onDelete={canManage ? handleDelete : undefined} />
+          <InfoCard key={item._id} item={item} onDelete={canManage ? handleDelete : undefined} onUpdated={refetch} />
         ))}
       </div>
     </Layout>

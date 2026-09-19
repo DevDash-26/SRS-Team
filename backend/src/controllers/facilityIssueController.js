@@ -1,17 +1,17 @@
 const FacilityIssue = require("../models/FacilityIssue");
 
 // Students only see issues they reported themselves; every other role sees all of them
-exports.getIssues = async (req, res) => {
+exports.getIssues = async (req, res, next) => {
   try {
     const filter = req.user.role === "student" ? { reportedBy: req.user._id } : {};
-    const issues = await FacilityIssue.find(filter).sort({ createdAt: -1 });
+    const issues = await FacilityIssue.find(filter).sort({ createdAt: -1 }).limit(200);
     res.json(issues);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.reportIssue = async (req, res) => {
+exports.reportIssue = async (req, res, next) => {
   try {
     const { title, location, description } = req.body;
     if (!title || !location) {
@@ -20,6 +20,6 @@ exports.reportIssue = async (req, res) => {
     const issue = await FacilityIssue.create({ title, location, description, reportedBy: req.user._id });
     res.status(201).json(issue);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

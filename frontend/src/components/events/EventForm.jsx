@@ -1,12 +1,22 @@
 import { useState } from "react";
 
-export default function EventForm({ onSubmit }) {
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [location, setLocation] = useState("");
-  const [organizer, setOrganizer] = useState("");
-  const [category, setCategory] = useState("event");
-  const [guestName, setGuestName] = useState("");
+// <input type="datetime-local"> needs YYYY-MM-DDTHH:mm in local time
+const toDateTimeInput = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+export default function EventForm({ onSubmit, initialValues, onCancel }) {
+  const isEdit = Boolean(initialValues);
+  const [title, setTitle] = useState(initialValues?.title || "");
+  const [date, setDate] = useState(toDateTimeInput(initialValues?.date));
+  const [location, setLocation] = useState(initialValues?.location || "");
+  const [organizer, setOrganizer] = useState(initialValues?.organizer || "");
+  const [category, setCategory] = useState(initialValues?.category || "event");
+  const [guestName, setGuestName] = useState(initialValues?.guestName || "");
   const [showGuestPopup, setShowGuestPopup] = useState(false);
   const [guestNameDraft, setGuestNameDraft] = useState("");
   const [guestPopupError, setGuestPopupError] = useState("");
@@ -50,7 +60,9 @@ export default function EventForm({ onSubmit }) {
     setSubmitting(true);
     try {
       await onSubmit({ title, date, location, organizer, category, guestName: category === "guest-lecture" ? guestName : undefined });
-      setTitle(""); setDate(""); setLocation(""); setOrganizer(""); setCategory("event"); setGuestName("");
+      if (!isEdit) {
+        setTitle(""); setDate(""); setLocation(""); setOrganizer(""); setCategory("event"); setGuestName("");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -58,7 +70,7 @@ export default function EventForm({ onSubmit }) {
 
   return (
     <form className="card" onSubmit={handleSubmit} style={{ position: "relative" }}>
-      <div style={{ fontWeight: 700, marginBottom: 14 }}>New event</div>
+      <div style={{ fontWeight: 700, marginBottom: 14 }}>{isEdit ? "Edit event" : "New event"}</div>
       <div className="form-group">
         <label>Title</label>
         <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Robotics Society Workshop" />
@@ -95,9 +107,16 @@ export default function EventForm({ onSubmit }) {
           </button>
         </div>
       )}
-      <button className="btn btn-primary" type="submit" disabled={submitting}>
-        {submitting ? "Publishing..." : "Publish event"}
-      </button>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button className="btn btn-primary" style={{ flex: 1 }} type="submit" disabled={submitting}>
+          {submitting ? "Saving..." : isEdit ? "Save changes" : "Publish event"}
+        </button>
+        {onCancel && (
+          <button className="btn btn-outline" style={{ flex: 1 }} type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
 
       {showGuestPopup && (
         <div

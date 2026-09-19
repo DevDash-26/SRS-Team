@@ -13,6 +13,7 @@ import AdminPanel from "../pages/AdminPanel";
 import FacilityIssues from "../pages/FacilityIssues";
 import TextbookExchange from "../pages/TextbookExchange";
 import Feedback from "../pages/Feedback";
+import InfoHub from "../pages/InfoHub";
 import InfoPage from "../pages/InfoPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 
@@ -44,6 +45,7 @@ export default function AppRoutes() {
       <Route path="/facility-issues" element={<ProtectedRoute><FacilityIssues /></ProtectedRoute>} />
       <Route path="/textbook-exchange" element={<ProtectedRoute><TextbookExchange /></ProtectedRoute>} />
       <Route path="/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
+      <Route path="/info" element={<ProtectedRoute><InfoHub /></ProtectedRoute>} />
       <Route path="/info/:category" element={<ProtectedRoute><InfoPage /></ProtectedRoute>} />
 
       <Route

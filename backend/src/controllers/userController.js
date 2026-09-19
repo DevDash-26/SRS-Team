@@ -3,23 +3,23 @@ const User = require("../models/User");
 const { ALL_ROLES, FACULTIES, YEAR_GROUPS, PROGRAMMES } = require("../utils/constants");
 const { isValidEmail } = require("../utils/validators");
 
-exports.getMe = async (req, res) => {
+exports.getMe = async (req, res, next) => {
   res.json(req.user);
 };
 
 // Admin-only: list every account, so the Users tab has something to show
-exports.getUsers = async (req, res) => {
+exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    const users = await User.find().select("-password").sort({ createdAt: -1 }).limit(500);
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // Admin-only: create any account with any role.
 // This is the ONLY place a new account can be created in the whole system.
-exports.createUser = async (req, res) => {
+exports.createUser = async (req, res, next) => {
   try {
     const { name, email, password, role, faculty, programme, yearGroup } = req.body;
 
@@ -72,6 +72,6 @@ exports.createUser = async (req, res) => {
       yearGroup: user.yearGroup,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

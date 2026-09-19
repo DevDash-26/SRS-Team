@@ -8,12 +8,13 @@ const AUDIENCE_OPTIONS = {
   programme: PROGRAMMES,
 };
 
-export default function AnnouncementForm({ onSubmit }) {
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-  const [audienceType, setAudienceType] = useState("university-wide");
-  const [audienceValue, setAudienceValue] = useState("");
-  const [type, setType] = useState("general");
+export default function AnnouncementForm({ onSubmit, initialValues, onCancel }) {
+  const isEdit = Boolean(initialValues);
+  const [title, setTitle] = useState(initialValues?.title || "");
+  const [message, setMessage] = useState(initialValues?.message || "");
+  const [audienceType, setAudienceType] = useState(initialValues?.audienceType || "university-wide");
+  const [audienceValue, setAudienceValue] = useState(initialValues?.audienceValue || "");
+  const [type, setType] = useState(initialValues?.type || "general");
   const [submitting, setSubmitting] = useState(false);
 
   const handleAudienceTypeChange = (e) => {
@@ -35,11 +36,13 @@ export default function AnnouncementForm({ onSubmit }) {
         audienceValue: audienceType === "university-wide" ? undefined : audienceValue,
         type,
       });
-      setTitle("");
-      setMessage("");
-      setAudienceType("university-wide");
-      setAudienceValue("");
-      setType("general");
+      if (!isEdit) {
+        setTitle("");
+        setMessage("");
+        setAudienceType("university-wide");
+        setAudienceValue("");
+        setType("general");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -47,7 +50,7 @@ export default function AnnouncementForm({ onSubmit }) {
 
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <div style={{ fontWeight: 700, marginBottom: 14 }}>New announcement</div>
+      <div style={{ fontWeight: 700, marginBottom: 14 }}>{isEdit ? "Edit announcement" : "New announcement"}</div>
       <div className="form-group">
         <label>Title</label>
         <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Guest lecture rescheduled" />
@@ -85,9 +88,16 @@ export default function AnnouncementForm({ onSubmit }) {
           <option value="schedule-change">Schedule Change</option>
         </select>
       </div>
-      <button className="btn btn-primary" type="submit" disabled={submitting}>
-        {submitting ? "Publishing..." : "Publish announcement"}
-      </button>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button className="btn btn-primary" style={{ flex: 1 }} type="submit" disabled={submitting}>
+          {submitting ? "Saving..." : isEdit ? "Save changes" : "Publish announcement"}
+        </button>
+        {onCancel && (
+          <button className="btn btn-outline" style={{ flex: 1 }} type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }

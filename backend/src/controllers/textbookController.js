@@ -1,15 +1,20 @@
 const TextbookListing = require("../models/TextbookListing");
 
-exports.getTextbooks = async (req, res) => {
+// The lister's name and email come back so an interested student can actually
+// reach them and complete the exchange.
+exports.getTextbooks = async (req, res, next) => {
   try {
-    const listings = await TextbookListing.find().sort({ createdAt: -1 });
+    const listings = await TextbookListing.find()
+      .populate("listedBy", "name email")
+      .sort({ createdAt: -1 })
+      .limit(200);
     res.json(listings);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.listTextbook = async (req, res) => {
+exports.listTextbook = async (req, res, next) => {
   try {
     const { title, subject, price } = req.body;
     if (!title) {
@@ -18,6 +23,6 @@ exports.listTextbook = async (req, res) => {
     const listing = await TextbookListing.create({ title, subject, price, listedBy: req.user._id });
     res.status(201).json(listing);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

@@ -25,6 +25,12 @@ const PROGRAMMES = [
 // the others are matched against the viewing student's own faculty/yearGroup/programme.
 const AUDIENCE_TYPES = ["university-wide", "faculty", "year-group", "programme"];
 
+const SUPPORT_TYPES = ["study-group", "peer-tutoring", "mentorship", "other"];
+
+const SUPPORT_STATUSES = ["open", "in-progress", "resolved"];
+
+const FEEDBACK_STATUSES = ["new", "reviewed"];
+
 const INFO_CATEGORIES = [
   "faq",
   "calendar",
@@ -43,4 +49,15 @@ const INFO_CATEGORIES = [
   "student-life",
 ];
 
-module.exports = { STAFF_ROLES, ALL_ROLES, INFO_CATEGORIES, FACULTIES, YEAR_GROUPS, PROGRAMMES, AUDIENCE_TYPES };
+module.exports = {
+  STAFF_ROLES,
+  ALL_ROLES,
+  INFO_CATEGORIES,
+  FACULTIES,
+  YEAR_GROUPS,
+  PROGRAMMES,
+  AUDIENCE_TYPES,
+  SUPPORT_TYPES,
+  SUPPORT_STATUSES,
+  FEEDBACK_STATUSES,
+};

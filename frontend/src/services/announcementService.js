@@ -6,5 +6,8 @@ export const getAnnouncements = () =>
 export const createAnnouncement = (payload) =>
   api.post("/announcements", payload).then((res) => res.data);
 
+export const updateAnnouncement = (id, payload) =>
+  api.put(`/announcements/${id}`, payload).then((res) => res.data);
+
 export const deleteAnnouncement = (id) =>
   api.delete(`/announcements/${id}`).then((res) => res.data);

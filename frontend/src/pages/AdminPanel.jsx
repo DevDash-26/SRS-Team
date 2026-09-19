@@ -7,27 +7,43 @@ import SocietyForm from "../components/societies/SocietyForm";
 import UserForm from "../components/users/UserForm";
 import { useFetch } from "../hooks/useFetch";
 import { useAuth } from "../hooks/useAuth";
-import { getAnnouncements, createAnnouncement, deleteAnnouncement } from "../services/announcementService";
-import { getEvents, createEvent, deleteEvent } from "../services/eventService";
+import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../services/announcementService";
+import { getEvents, createEvent, updateEvent, deleteEvent } from "../services/eventService";
 import { getSocieties, createSociety, deleteSociety } from "../services/societyService";
 import { getUsers, createUser } from "../services/userService";
 
-function ManageList({ items, loading, error, onDelete, renderLabel }) {
+function ManageList({ items, loading, error, onDelete, renderLabel, renderEditor }) {
+  const [editingId, setEditingId] = useState(null);
+
   if (loading) return <Loader label="Loading..." />;
   if (error) return <div className="error-text">{error}</div>;
   if (!items || items.length === 0) return <div className="muted">Nothing here yet.</div>;
+
   return (
     <div className="card">
-      {items.map((item) => (
-        <div key={item._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #F0EFEA" }}>
-          <div style={{ fontSize: 13 }}>{renderLabel(item)}</div>
-          {onDelete && (
-            <button className="btn btn-outline" style={{ height: 30, fontSize: 11.5, padding: "0 10px" }} onClick={() => onDelete(item._id)}>
-              Delete
-            </button>
-          )}
-        </div>
-      ))}
+      {items.map((item) =>
+        renderEditor && editingId === item._id ? (
+          <div key={item._id} style={{ padding: "10px 0", borderBottom: "1px solid #F0EFEA" }}>
+            {renderEditor(item, () => setEditingId(null))}
+          </div>
+        ) : (
+          <div key={item._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: "1px solid #F0EFEA" }}>
+            <div style={{ fontSize: 13 }}>{renderLabel(item)}</div>
+            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+              {renderEditor && (
+                <button className="btn btn-outline" style={{ height: 30, fontSize: 11.5, padding: "0 10px" }} onClick={() => setEditingId(item._id)}>
+                  Edit
+                </button>
+              )}
+              {onDelete && (
+                <button className="btn btn-outline" style={{ height: 30, fontSize: 11.5, padding: "0 10px" }} onClick={() => onDelete(item._id)}>
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        )
+      )}
     </div>
   );
 }
@@ -62,6 +78,13 @@ export default function AdminPanel() {
               error={announcements.error}
               onDelete={async (id) => { await deleteAnnouncement(id); announcements.refetch(); }}
               renderLabel={(a) => `${a.title} · ${!a.audienceType || a.audienceType === "university-wide" ? "University-wide" : a.audienceValue}`}
+              renderEditor={(a, done) => (
+                <AnnouncementForm
+                  initialValues={a}
+                  onCancel={done}
+                  onSubmit={async (payload) => { await updateAnnouncement(a._id, payload); done(); announcements.refetch(); }}
+                />
+              )}
             />
           )}
           {tab === "events" && (
@@ -71,6 +94,13 @@ export default function AdminPanel() {
               error={events.error}
               onDelete={async (id) => { await deleteEvent(id); events.refetch(); }}
               renderLabel={(e) => `${e.title} · ${e.location || ""}`}
+              renderEditor={(e, done) => (
+                <EventForm
+                  initialValues={e}
+                  onCancel={done}
+                  onSubmit={async (payload) => { await updateEvent(e._id, payload); done(); events.refetch(); }}
+                />
+              )}
             />
           )}
           {tab === "societies" && (

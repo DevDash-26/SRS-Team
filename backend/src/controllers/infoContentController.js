@@ -1,21 +1,21 @@
 const InfoContent = require("../models/InfoContent");
 const { INFO_CATEGORIES } = require("../utils/constants");
 
-exports.getByCategory = async (req, res) => {
+exports.getByCategory = async (req, res, next) => {
   try {
     const { category } = req.params;
     if (!INFO_CATEGORIES.includes(category)) {
       return res.status(404).json({ message: "Unknown info category" });
     }
-    const items = await InfoContent.find({ category }).sort({ date: 1, createdAt: -1 });
+    const items = await InfoContent.find({ category }).sort({ date: 1, createdAt: -1 }).limit(200);
     res.json(items);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // Staff only (not students) — used to manage entries like the academic calendar
-exports.createInfoContent = async (req, res) => {
+exports.createInfoContent = async (req, res, next) => {
   try {
     const { category } = req.params;
     const { title, body, date } = req.body;
@@ -28,11 +28,32 @@ exports.createInfoContent = async (req, res) => {
     const item = await InfoContent.create({ category, title, body, date, createdBy: req.user._id });
     res.status(201).json(item);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-exports.deleteInfoContent = async (req, res) => {
+// Keeps published info (FAQ answers, calendar dates, opening hours...) correctable in place
+exports.updateInfoContent = async (req, res, next) => {
+  try {
+    const { title, body, date } = req.body;
+    if (!title || !body) {
+      return res.status(400).json({ message: "Title and body are required" });
+    }
+    const item = await InfoContent.findByIdAndUpdate(
+      req.params.id,
+      { title, body, date },
+      { new: true, runValidators: true }
+    );
+    if (!item) {
+      return res.status(404).json({ message: "Entry not found" });
+    }
+    res.json(item);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteInfoContent = async (req, res, next) => {
   try {
     const item = await InfoContent.findByIdAndDelete(req.params.id);
     if (!item) {
@@ -40,6 +61,6 @@ exports.deleteInfoContent = async (req, res) => {
     }
     res.json({ message: "Entry deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

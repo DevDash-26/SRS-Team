@@ -1,6 +1,6 @@
 const SocietyMembership = require("../models/SocietyMembership");
 
-exports.joinSociety = async (req, res) => {
+exports.joinSociety = async (req, res, next) => {
   try {
     const societyId = req.params.id;
     const existing = await SocietyMembership.findOne({ society: societyId, user: req.user._id });
@@ -10,6 +10,6 @@ exports.joinSociety = async (req, res) => {
     await SocietyMembership.create({ society: societyId, user: req.user._id });
     res.json({ joined: true });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
