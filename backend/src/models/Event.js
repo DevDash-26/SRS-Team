@@ -6,7 +6,8 @@ const eventSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     location: { type: String },
     organizer: { type: String },
-    category: { type: String, enum: ["event", "guest-lecture"], default: "event" },
+    category: { type: String, enum: ["event", "workshop", "guest-lecture"], default: "event" },
+    guestName: { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

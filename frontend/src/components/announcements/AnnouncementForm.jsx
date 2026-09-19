@@ -1,21 +1,44 @@
 import { useState } from "react";
+import { FACULTIES, YEAR_GROUPS, PROGRAMMES } from "../../utils/constants";
+
+const AUDIENCE_OPTIONS = {
+  "university-wide": null,
+  faculty: FACULTIES,
+  "year-group": YEAR_GROUPS,
+  programme: PROGRAMMES,
+};
 
 export default function AnnouncementForm({ onSubmit }) {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [audience, setAudience] = useState("");
+  const [audienceType, setAudienceType] = useState("university-wide");
+  const [audienceValue, setAudienceValue] = useState("");
   const [type, setType] = useState("general");
   const [submitting, setSubmitting] = useState(false);
+
+  const handleAudienceTypeChange = (e) => {
+    const value = e.target.value;
+    setAudienceType(value);
+    setAudienceValue(AUDIENCE_OPTIONS[value] ? AUDIENCE_OPTIONS[value][0] : "");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !message) return;
+    if (audienceType !== "university-wide" && !audienceValue) return;
     setSubmitting(true);
     try {
-      await onSubmit({ title, message, audience, type });
+      await onSubmit({
+        title,
+        message,
+        audienceType,
+        audienceValue: audienceType === "university-wide" ? undefined : audienceValue,
+        type,
+      });
       setTitle("");
       setMessage("");
-      setAudience("");
+      setAudienceType("university-wide");
+      setAudienceValue("");
       setType("general");
     } finally {
       setSubmitting(false);
@@ -35,8 +58,25 @@ export default function AnnouncementForm({ onSubmit }) {
       </div>
       <div className="form-group">
         <label>Audience</label>
-        <input className="input" value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="e.g. Software Engineering, Final Year" />
+        <select className="input" value={audienceType} onChange={handleAudienceTypeChange}>
+          <option value="university-wide">University-wide</option>
+          <option value="faculty">Specific faculty</option>
+          <option value="year-group">Specific year group</option>
+          <option value="programme">Specific programme</option>
+        </select>
       </div>
+      {AUDIENCE_OPTIONS[audienceType] && (
+        <div className="form-group">
+          <label>
+            {audienceType === "faculty" ? "Faculty" : audienceType === "year-group" ? "Year group" : "Programme"}
+          </label>
+          <select className="input" value={audienceValue} onChange={(e) => setAudienceValue(e.target.value)}>
+            {AUDIENCE_OPTIONS[audienceType].map((v) => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="form-group">
         <label>Type</label>
         <select className="input" value={type} onChange={(e) => setType(e.target.value)}>

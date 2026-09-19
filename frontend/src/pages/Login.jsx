@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import uclLogo from "../assets/ucl-logo.png";
+import { isValidEmail } from "../utils/validators";
 
 function EyeIcon({ off }) {
   return (
@@ -33,6 +34,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!isValidEmail(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
     setSubmitting(true);
     try {
       await login(email, password);
@@ -75,7 +80,10 @@ export default function Login() {
           >
             <img src={uclLogo} alt="UCL logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </div>
-          <div style={{ fontWeight: 700, fontSize: 18 }}>UCL Campus</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 18 }}>UCL Campus</div>
+            <div style={{ fontSize: 10.5, color: "#D9B8B5" }}>Universal College Lanka</div>
+          </div>
         </div>
         <div>
           <div style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.2 }}>
@@ -133,7 +141,7 @@ export default function Login() {
             {submitting ? "Signing in..." : "Sign in to UCL Campus"}
           </button>
           <div className="muted" style={{ textAlign: "center", marginTop: 14 }}>
-            Forgot password? Contact your administrator.
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
         </form>
       </div>

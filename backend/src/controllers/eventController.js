@@ -26,9 +26,12 @@ exports.getEvents = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
   try {
-    const { title, date, location, organizer, category } = req.body;
+    const { title, date, location, organizer, category, guestName } = req.body;
     if (!title || !date) {
       return res.status(400).json({ message: "Title and date are required" });
+    }
+    if (category === "guest-lecture" && !guestName) {
+      return res.status(400).json({ message: "Guest lecturer's name is required" });
     }
     const event = await Event.create({
       title,
@@ -36,6 +39,7 @@ exports.createEvent = async (req, res) => {
       location,
       organizer,
       category,
+      guestName: category === "guest-lecture" ? guestName : undefined,
       createdBy: req.user._id,
     });
     res.status(201).json(event);

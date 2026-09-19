@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 
 const cards = [
   { to: "/announcements", label: "Announcements", desc: "Faculty and university-wide updates, filtered for you." },
+  { to: "/info/calendar", label: "Academic Calendar", desc: "Key term dates, exams and deadlines." },
   { to: "/events", label: "Events", desc: "University and society events. Mark your interest." },
   { to: "/societies", label: "Societies", desc: "Discover and join student societies." },
   { to: "/lost-found", label: "Lost & Found", desc: "Report or search for lost campus items." },

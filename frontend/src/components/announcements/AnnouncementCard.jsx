@@ -1,5 +1,9 @@
 export default function AnnouncementCard({ announcement }) {
   const isUrgent = announcement.type === "emergency";
+  const audienceLabel =
+    !announcement.audienceType || announcement.audienceType === "university-wide"
+      ? "University-wide"
+      : announcement.audienceValue;
   return (
     <div
       className="card"
@@ -18,7 +22,7 @@ export default function AnnouncementCard({ announcement }) {
         </div>
         <div className="muted" style={{ marginTop: 4 }}>{announcement.message}</div>
         <div className="muted" style={{ fontSize: 11.5, marginTop: 8 }}>
-          {announcement.audience || "University-wide"}
+          {audienceLabel}
           {announcement.createdAt ? ` · ${new Date(announcement.createdAt).toLocaleDateString()}` : ""}
         </div>
       </div>

@@ -6,22 +6,58 @@ export default function EventForm({ onSubmit }) {
   const [location, setLocation] = useState("");
   const [organizer, setOrganizer] = useState("");
   const [category, setCategory] = useState("event");
+  const [guestName, setGuestName] = useState("");
+  const [showGuestPopup, setShowGuestPopup] = useState(false);
+  const [guestNameDraft, setGuestNameDraft] = useState("");
+  const [guestPopupError, setGuestPopupError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    setCategory(value);
+    if (value === "guest-lecture") {
+      setGuestNameDraft(guestName);
+      setGuestPopupError("");
+      setShowGuestPopup(true);
+    } else {
+      setGuestName("");
+    }
+  };
+
+  const handleGuestPopupSave = () => {
+    if (!guestNameDraft.trim()) {
+      setGuestPopupError("Enter the guest lecturer's name.");
+      return;
+    }
+    setGuestName(guestNameDraft.trim());
+    setShowGuestPopup(false);
+  };
+
+  const handleGuestPopupCancel = () => {
+    if (!guestName) setCategory("event");
+    setShowGuestPopup(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !date) return;
+    if (category === "guest-lecture" && !guestName) {
+      setGuestNameDraft("");
+      setGuestPopupError("");
+      setShowGuestPopup(true);
+      return;
+    }
     setSubmitting(true);
     try {
-      await onSubmit({ title, date, location, organizer, category });
-      setTitle(""); setDate(""); setLocation(""); setOrganizer(""); setCategory("event");
+      await onSubmit({ title, date, location, organizer, category, guestName: category === "guest-lecture" ? guestName : undefined });
+      setTitle(""); setDate(""); setLocation(""); setOrganizer(""); setCategory("event"); setGuestName("");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form className="card" onSubmit={handleSubmit}>
+    <form className="card" onSubmit={handleSubmit} style={{ position: "relative" }}>
       <div style={{ fontWeight: 700, marginBottom: 14 }}>New event</div>
       <div className="form-group">
         <label>Title</label>
@@ -41,14 +77,65 @@ export default function EventForm({ onSubmit }) {
       </div>
       <div className="form-group">
         <label>Category</label>
-        <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+        <select className="input" value={category} onChange={handleCategoryChange}>
           <option value="event">Event</option>
+          <option value="workshop">Workshop</option>
           <option value="guest-lecture">Guest Lecture</option>
         </select>
       </div>
+      {category === "guest-lecture" && guestName && (
+        <div className="muted" style={{ fontSize: 12, marginTop: -6, marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>Guest lecturer: <strong>{guestName}</strong></span>
+          <button
+            type="button"
+            onClick={() => { setGuestNameDraft(guestName); setGuestPopupError(""); setShowGuestPopup(true); }}
+            style={{ background: "none", border: "none", padding: 0, color: "var(--red)", cursor: "pointer", font: "inherit", fontWeight: 700 }}
+          >
+            Edit
+          </button>
+        </div>
+      )}
       <button className="btn btn-primary" type="submit" disabled={submitting}>
         {submitting ? "Publishing..." : "Publish event"}
       </button>
+
+      {showGuestPopup && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(23,24,28,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+          }}
+          onClick={handleGuestPopupCancel}
+        >
+          <div className="card" style={{ width: 320 }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ fontWeight: 700, marginBottom: 10 }}>Guest lecture details</div>
+            <div className="form-group">
+              <label>Guest lecturer's name</label>
+              <input
+                className="input"
+                autoFocus
+                value={guestNameDraft}
+                onChange={(e) => setGuestNameDraft(e.target.value)}
+                placeholder="e.g. Dr. Jane Perera"
+              />
+            </div>
+            {guestPopupError && <div className="error-text" style={{ marginBottom: 10 }}>{guestPopupError}</div>}
+            <div style={{ display: "flex", gap: 8 }}>
+              <button type="button" className="btn btn-primary" style={{ flex: 1 }} onClick={handleGuestPopupSave}>
+                Save
+              </button>
+              <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={handleGuestPopupCancel}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

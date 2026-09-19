@@ -2,9 +2,12 @@ import { useState } from "react";
 import Layout from "../components/common/Layout";
 import Loader from "../components/common/Loader";
 import { useFetch } from "../hooks/useFetch";
+import { useAuth } from "../hooks/useAuth";
 import { getFacilityIssues, reportFacilityIssue } from "../services/facilityIssueService";
 
 export default function FacilityIssues() {
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
   const { data, loading, error, refetch } = useFetch(getFacilityIssues, []);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -46,9 +49,14 @@ export default function FacilityIssues() {
           </button>
         </form>
         <div style={{ flex: 1 }}>
+          <div className="muted" style={{ fontWeight: 700, textTransform: "uppercase", fontSize: 11.5, marginBottom: 10 }}>
+            {isStudent ? "Issues you've reported" : "All reported issues"}
+          </div>
           {loading && <Loader label="Loading reported issues..." />}
           {error && <div className="error-text">{error}</div>}
-          {!loading && !error && (!data || data.length === 0) && <div className="muted">No issues reported yet.</div>}
+          {!loading && !error && (!data || data.length === 0) && (
+            <div className="muted">{isStudent ? "You haven't reported any issues yet." : "No issues reported yet."}</div>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {data?.map((i) => (
               <div key={i._id} className="card">

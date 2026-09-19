@@ -61,7 +61,7 @@ export default function AdminPanel() {
               loading={announcements.loading}
               error={announcements.error}
               onDelete={async (id) => { await deleteAnnouncement(id); announcements.refetch(); }}
-              renderLabel={(a) => `${a.title} · ${a.audience || "University-wide"}`}
+              renderLabel={(a) => `${a.title} · ${!a.audienceType || a.audienceType === "university-wide" ? "University-wide" : a.audienceValue}`}
             />
           )}
           {tab === "events" && (
@@ -87,7 +87,7 @@ export default function AdminPanel() {
               items={users.data}
               loading={users.loading}
               error={users.error}
-              renderLabel={(u) => `${u.name} · ${u.email} · ${u.role}`}
+              renderLabel={(u) => `${u.name} · ${u.email} · ${[u.role, u.faculty, u.programme, u.yearGroup].filter(Boolean).join(" · ")}`}
             />
           )}
         </div>
