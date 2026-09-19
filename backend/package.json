@@ -1,12 +1,12 @@
 {
   "name": "campus-hub-backend",
   "version": "1.0.0",
-  "description": "UCL Campus Hub — backend (Express + MongoDB)",
+  "description": "UCL Campus Hub \u2014 backend (Express + MongoDB)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node api.js && node server.js",
+    "dev": "node api.js && nodemon server.js",
     "seed": "node scripts/seed.js"
   },
   "dependencies": {
