@@ -1,11 +1,11 @@
 {
   "name": "campus-hub-frontend",
   "version": "1.0.0",
-  "description": "UCL Campus Hub — frontend (React)",
+  "description": "UCL Campus Hub \u2014 frontend (React)",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "node init && vite",
+    "build": "node init && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
